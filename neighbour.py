@@ -4,6 +4,8 @@
     neighborhood relations (TRANSPOSE, EXCHANGE or INSERT).
 """
 
+import random
+
 FIRST_IMPROVEMENT = "FIRST_IMPROVEMENT"
 BEST_IMPROVEMENT = "BEST_IMPROVEMENT"
 
@@ -121,3 +123,10 @@ def get_best_improvement_neighbour(instance, solution, initial_wct, neighbourhoo
         if min_wct != initial_wct and min_sol:
             return min_sol, min_wct
         return None, initial_wct
+
+
+def get_random_insert_neighbor(instance, solution):
+    i, j = random.sample(set(range(len(solution))), 2)
+    temp = solution.pop(i)
+    solution.insert(j, temp)
+    return solution

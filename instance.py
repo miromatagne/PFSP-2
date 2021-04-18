@@ -2,10 +2,14 @@
     PFSP instance file
 """
 
-from neighbour import get_best_improvement_neighbour, get_first_improvement_neighbour
+from neighbour import get_best_improvement_neighbour, get_first_improvement_neighbour, get_random_insert_neighbor
+import time
+import random
 
 FIRST_IMPROVEMENT = "FIRST_IMPROVEMENT"
 BEST_IMPROVEMENT = "BEST_IMPROVEMENT"
+
+INSERT = "INSERT"
 
 
 class Instance:
@@ -95,8 +99,9 @@ class Instance:
             Solves the PSFP problem using Iterative Improvement and returns the solution.
 
             :param solution: initial solution used to start the algorithm
-            :pivoting_rule: pivoting rule used during the algorithm (LEAST_IMPROVEMENT or BEST_IMPORVEMENT)
-            :neighborhood_rule: neighborhood rule used during the algorithm (EXCHANGE, TRASPOSE or INSERT)
+            :param pivoting_rule: pivoting rule used during the algorithm (LEAST_IMPROVEMENT or BEST_IMPORVEMENT)
+            :param neighborhood_rule: neighborhood rule used during the algorithm (EXCHANGE, TRASPOSE or INSERT)
+            :return: the solution and the associated WCT
         """
         initial_wct = self.compute_wct(solution)
         if pivoting_rule == FIRST_IMPROVEMENT:
@@ -125,7 +130,8 @@ class Instance:
             Solves the PSFP problem using Variable Neighborhood Descent and returns the solution.
 
             :param solution: initial solution used to start the algorithm
-            :neighborhood_order: neighborhood order used during the algorithm (FIRST_ORDER or SECOND_ORDER)
+            :param neighborhood_order: neighborhood order used during the algorithm (FIRST_ORDER or SECOND_ORDER)
+            :return: the solution and the associated WCT
         """
         k = 3
         i = 0
@@ -141,3 +147,41 @@ class Instance:
                 wct = temp_wct
                 i = 0
         return sol, wct
+
+    def solve_rii(self, solution, probability, time_limit):
+        """
+            Solves the PFSP problem using Randomised Iterative Improvement and returns the solution.
+
+            :param solution: initial solution used to start the algorithm
+            :return: the solution and the WCT
+        """
+        start = time.time()
+        sol = solution.copy()
+        best_solution = sol.copy()
+        best_wct = self.compute_wct(sol)
+        random_count = 0
+        non_random_count = 0
+        while time.time() < start + time_limit:
+            r = random.random()
+            if r < probability:
+                random_count += 1
+                # Pick random neighbor
+                sol = get_random_insert_neighbor(self, sol)
+                wct = self.compute_wct(sol)
+            else:
+                non_random_count += 1
+                # Pick first improving neighbor
+                wct = self.compute_wct(sol)
+                temp_sol, temp_wct = get_first_improvement_neighbour(
+                    self, sol.copy(), wct, INSERT)
+                if temp_sol is not None:
+                    sol = temp_sol.copy()
+                    wct = temp_wct
+            if wct < best_wct:
+                # print(best_wct)
+                best_solution = sol.copy()
+                best_wct = wct
+
+        print("Random:", random_count)
+        print("Non random:", non_random_count)
+        return best_solution, best_wct

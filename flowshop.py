@@ -19,6 +19,7 @@ from initial_solution import get_random_permutation, get_rz_heuristic
 from measures import measure_vnd_times, measure_ii_times, get_experimental_results_vnd
 import time
 import os
+import multiprocessing
 
 FIRST_IMPROVEMENT = "FIRST_IMPROVEMENT"
 BEST_IMPROVEMENT = "BEST_IMPROVEMENT"
@@ -90,29 +91,49 @@ def parse_args():
     return args.vnd, args.instance, pivoting, neighbourhood, initial_solution, args.measure, neighbourhood_order
 
 
-if __name__ == '__main__':
-    vnd, filename, pivoting_arg, neighbourhood_arg, initial_solution_arg, measure, neighbourhood_order = parse_args()
-    if measure:
-        if vnd:
-            measure_vnd_times()
-        else:
-            measure_ii_times()
-    else:
-        instance = Instance()
-        instance.read_data_from_file(filename)
-        if initial_solution_arg == RANDOM_INIT:
-            initial_solution = get_random_permutation(instance.get_nb_jobs())
-        else:
-            initial_solution = get_rz_heuristic(instance)
-        print("Initial solution : ", initial_solution)
-        start_time = time.time()
+def test():
+    instance = Instance()
+    instance.read_data_from_file("./instances/50_20_01")
+    initial_solution = get_random_permutation(instance.get_nb_jobs())
+    solution, wct = instance.solve_rii(initial_solution, 0.1, 350)
+    print(solution)
+    print(wct)
 
-        if vnd:
-            solution, wct = instance.solve_vnd(
-                initial_solution, neighbourhood_order)
-        else:
-            solution, wct = instance.solve_ii(
-                initial_solution, pivoting_arg, neighbourhood_arg)
-        print("Final job permutation : ", solution)
-        print("Weighted sum of Completion Times : ", wct)
-        print("Execution time : %s seconds" % (time.time() - start_time))
+
+if __name__ == '__main__':
+    # vnd, filename, pivoting_arg, neighbourhood_arg, initial_solution_arg, measure, neighbourhood_order = parse_args()
+    # if measure:
+    #     if vnd:
+    #         measure_vnd_times()
+    #     else:
+    #         measure_ii_times()
+    # else:
+    #     instance = Instance()
+    #     instance.read_data_from_file(filename)
+    #     if initial_solution_arg == RANDOM_INIT:
+    #         initial_solution = get_random_permutation(instance.get_nb_jobs())
+    #     else:
+    #         initial_solution = get_rz_heuristic(instance)
+    #     print("Initial solution : ", initial_solution)
+    #     start_time = time.time()
+
+    #     if vnd:
+    #         solution, wct = instance.solve_vnd(
+    #             initial_solution, neighbourhood_order)
+    #     else:
+    #         solution, wct = instance.solve_ii(
+    #             initial_solution, pivoting_arg, neighbourhood_arg)
+    #     print("Final job permutation : ", solution)
+    #     print("Weighted sum of Completion Times : ", wct)
+    #     print("Execution time : %s seconds" % (time.time() - start_time))
+    t = time.time()
+    processes = []
+    for i in range(1, 5):
+        p = multiprocessing.Process(target=test)
+        processes.append(p)
+        p.start()
+
+    for process in processes:
+        process.join()
+
+    print(time.time() - t)
