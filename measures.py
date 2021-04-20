@@ -97,6 +97,28 @@ def measure_ii_times():
     return None
 
 
+def measure_rii(i, p, f, time_limit):
+    """
+    """
+    if "." not in f and f != "Measures":
+        output_file = open("../Statistics/Measures/RII/Random/" + str(p) + "/" +
+                           f + "_" + str(i) + ".txt", "w")
+        instance = Instance()
+        instance.read_data_from_file(f)
+        initial_solution = get_random_permutation(
+            instance.get_nb_jobs())
+        print("Initial solution : ", initial_solution)
+        solution, wct = instance.solve_rii(initial_solution, p, time_limit)
+        output_file.write(str(wct) + "\n")
+
+        print("Final job permutation : ", solution)
+        print("Weighted sum of Completion Times : ", wct)
+        output_file.close()
+    else:
+        print(f)
+    return None
+
+
 def get_experimental_results_vnd():
     """
         Measure execution times and solutions for all instances, and group the results
@@ -161,3 +183,24 @@ def get_experimental_results_ii():
             f.close()
     for f in files:
         f.close()
+
+
+def arrange_rii_files():
+    os.chdir("Statistics/Measures/RII/Random/0.1")
+    files = os.listdir()
+    files.sort()
+    result_files = []
+    for f in files:
+        if "DS" not in f:
+            if f[:-6] not in result_files:
+                print(f)
+                indiv_file = open(f, "r")
+                indiv_line = indiv_file.readline()
+                res_file = open(f[:-6], "w")
+                res_file.write(indiv_line)
+                result_files.append(f[:-6])
+            else:
+                indiv_file = open(f, "w")
+                indiv_line = indiv_file.readline()
+                res_file = open(f[:-6], "a+")
+                res_file.write(indiv_line)

@@ -16,7 +16,7 @@ import random
 import argparse
 from instance import Instance
 from initial_solution import get_random_permutation, get_rz_heuristic
-from measures import measure_vnd_times, measure_ii_times, get_experimental_results_vnd
+from measures import measure_vnd_times, measure_ii_times, get_experimental_results_vnd, measure_rii, arrange_rii_files
 import time
 import os
 import multiprocessing
@@ -91,10 +91,11 @@ def parse_args():
     return args.vnd, args.instance, pivoting, neighbourhood, initial_solution, args.measure, neighbourhood_order
 
 
-def test():
+def test(filename):
     instance = Instance()
-    instance.read_data_from_file("./instances/50_20_01")
-    initial_solution = get_random_permutation(instance.get_nb_jobs())
+    instance.read_data_from_file(filename)
+    #initial_solution = get_random_permutation(instance.get_nb_jobs())
+    initial_solution = get_rz_heuristic(instance)
     solution, wct = instance.solve_rii(initial_solution, 0.1, 350)
     print(solution)
     print(wct)
@@ -126,12 +127,25 @@ if __name__ == '__main__':
     #     print("Final job permutation : ", solution)
     #     print("Weighted sum of Completion Times : ", wct)
     #     print("Execution time : %s seconds" % (time.time() - start_time))
+    # arrange_rii_files()
     t = time.time()
     processes = []
-    for i in range(1, 5):
-        p = multiprocessing.Process(target=test)
-        processes.append(p)
-        p.start()
+    os.chdir("instances")
+    files = os.listdir()
+    files.sort()
+    for f in files:
+        if "." not in f and f != "measures" and "100" in f:
+            for i in range(5):
+                p = multiprocessing.Process(
+                    target=measure_rii, args=(i, 0.1, f, 350,))
+                processes.append(p)
+                p.start()
+        if "." not in f and f != "measures" and "50" in f:
+            for i in range(5):
+                p = multiprocessing.Process(
+                    target=measure_rii, args=(i, 0.1, f, 150,))
+                processes.append(p)
+                p.start()
 
     for process in processes:
         process.join()

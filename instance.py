@@ -155,21 +155,21 @@ class Instance:
             :param solution: initial solution used to start the algorithm
             :return: the solution and the WCT
         """
-        start = time.time()
+        start = time.process_time()
         sol = solution.copy()
         best_solution = sol.copy()
         best_wct = self.compute_wct(sol)
         random_count = 0
         non_random_count = 0
-        while time.time() < start + time_limit:
+        while time.process_time() < start + time_limit:
             r = random.random()
             if r < probability:
-                random_count += 1
+                #random_count += 1
                 # Pick random neighbor
                 sol = get_random_insert_neighbor(self, sol)
                 wct = self.compute_wct(sol)
             else:
-                non_random_count += 1
+                #non_random_count += 1
                 # Pick first improving neighbor
                 wct = self.compute_wct(sol)
                 temp_sol, temp_wct = get_first_improvement_neighbour(
@@ -182,6 +182,6 @@ class Instance:
                 best_solution = sol.copy()
                 best_wct = wct
 
-        print("Random:", random_count)
-        print("Non random:", non_random_count)
+        #print("Random:", random_count)
+        #print("Non random:", non_random_count)
         return best_solution, best_wct
