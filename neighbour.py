@@ -130,3 +130,22 @@ def get_random_insert_neighbor(instance, solution):
     temp = solution.pop(i)
     solution.insert(j, temp)
     return solution
+
+
+def get_rii_insert_neighbor(instance, solution, initial_wct):
+    best_non_improving_sol = None
+    best_non_improving_wct = float('inf')
+    for i in range(len(solution)):
+        temp_sol = solution.copy()
+        temp_rem = temp_sol.pop(i)
+        temp_sol.insert(0, temp_rem)
+        for j in range(len(solution)):
+            wct = instance.compute_wct(temp_sol)
+            if wct < initial_wct:
+                return temp_sol, wct
+            elif wct < best_non_improving_wct:
+                best_non_improving_sol = temp_sol.copy()
+                best_non_improving_wct = wct
+            if j != len(solution) - 1:
+                temp_sol[j], temp_sol[j+1] = temp_sol[j+1], temp_sol[j]
+    return best_non_improving_sol, best_non_improving_wct

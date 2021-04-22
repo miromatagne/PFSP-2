@@ -101,7 +101,7 @@ def measure_rii(i, p, f, time_limit):
     """
     """
     if "." not in f and f != "Measures":
-        output_file = open("../Statistics/Measures/RII/Random/" + str(p) + "/" +
+        output_file = open("../Statistics/Measures/RII/Random/" + str(p) + "/Raw/" +
                            f + "_" + str(i) + ".txt", "w")
         instance = Instance()
         instance.read_data_from_file(f)
@@ -186,21 +186,29 @@ def get_experimental_results_ii():
 
 
 def arrange_rii_files():
-    os.chdir("Statistics/Measures/RII/Random/0.1")
-    files = os.listdir()
-    files.sort()
-    result_files = []
-    for f in files:
-        if "DS" not in f:
-            if f[:-6] not in result_files:
-                print(f)
-                indiv_file = open(f, "r")
-                indiv_line = indiv_file.readline()
-                res_file = open(f[:-6], "w")
-                res_file.write(indiv_line)
-                result_files.append(f[:-6])
-            else:
-                indiv_file = open(f, "w")
-                indiv_line = indiv_file.readline()
-                res_file = open(f[:-6], "a+")
-                res_file.write(indiv_line)
+    probabilities = [0.1, 0.2, 0.3, 0.4, 0.5]
+    for p in probabilities:
+        os.chdir("Statistics/Measures/RII/Random/" + str(p) + "/Raw")
+        files = os.listdir()
+        files.sort()
+        result_files = []
+        for f in files:
+            if "DS" not in f:
+                if f[:-6] not in result_files:
+                    indiv_file = open(f, "r")
+                    indiv_line = indiv_file.readlines()
+                    indiv_line = indiv_line[0]
+                    res_file = open("../Grouped/" + f[:-6] + ".txt", "w")
+                    res_file.write(indiv_line)
+                    result_files.append(f[:-6])
+                    indiv_file.close()
+                    res_file.close()
+                else:
+                    print(f)
+                    indiv_file = open(f, "r")
+                    indiv_line = indiv_file.readlines()
+                    indiv_line = indiv_line[0]
+                    res_file = open("../Grouped" + f[:-6] + ".txt", "a+")
+                    res_file.write(indiv_line)
+                    indiv_file.close()
+                    res_file.close()

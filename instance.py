@@ -2,13 +2,21 @@
     PFSP instance file
 """
 
-from neighbour import get_best_improvement_neighbour, get_first_improvement_neighbour, get_random_insert_neighbor
-from initial_solution import get_rz_heuristic
+from neighbour import get_best_improvement_neighbour, get_first_improvement_neighbour, get_random_insert_neighbor, get_rii_insert_neighbor
+from initial_solution import get_rz_heuristic, get_random_permutation
 import time
 import random
 
 FIRST_IMPROVEMENT = "FIRST_IMPROVEMENT"
 BEST_IMPROVEMENT = "BEST_IMPROVEMENT"
+
+TRANSPOSE = "TRANSPOSE"
+EXCHANGE = "EXCHANGE"
+INSERT = "INSERT"
+
+FIRST_ORDER = [TRANSPOSE, EXCHANGE, INSERT]
+SECOND_ORDER = [TRANSPOSE, INSERT, EXCHANGE]
+
 
 INSERT = "INSERT"
 
@@ -149,7 +157,7 @@ class Instance:
                 i = 0
         return sol, wct
 
-    def solve_rii(self, solution, probability, time_limit):
+    def solve_rii(self, probability, time_limit):
         """
             Solves the PFSP problem using Randomised Iterative Improvement and returns the solution.
 
@@ -157,7 +165,7 @@ class Instance:
             :return: the solution and the WCT
         """
         start = time.process_time()
-        sol = solution.copy()
+        sol = get_random_permutation(self.nb_jobs)
         best_solution = sol.copy()
         best_wct = self.compute_wct(sol)
         random_count = 0
@@ -173,8 +181,8 @@ class Instance:
                 #non_random_count += 1
                 # Pick first improving neighbor
                 wct = self.compute_wct(sol)
-                temp_sol, temp_wct = get_first_improvement_neighbour(
-                    self, sol.copy(), wct, INSERT)
+                temp_sol, temp_wct = get_rii_insert_neighbor(
+                    self, sol.copy(), wct)
                 if temp_sol is not None:
                     sol = temp_sol.copy()
                     wct = temp_wct
@@ -187,14 +195,36 @@ class Instance:
         #print("Non random:", non_random_count)
         return best_solution, best_wct
 
-    def solve_ils(self):
+    def solve_ils(self, time_limit):
         start = time.process_time()
         # Initial solution
-        initial_solution = get_rz_heuristic(self.nb_jobs)
+        initial_solution = get_rz_heuristic(self)
+        print(initial_solution)
         # Local search
+        sol, wct = self.solve_vnd(initial_solution, SECOND_ORDER)
+        best_sol = sol.copy()
+        best_wct = wct
 
         while time.process_time() < start + time_limit:
             # Perturbation
+            sol = self.perturbation(3, sol)
             # Local search
+            sol, wct = self.solve_vnd(sol.copy(), SECOND_ORDER)
             # Accept criterion
-            pass
+            if self.accept(sol, wct, best_sol, best_wct):
+                best_sol = sol.copy()
+                best_wct = wct
+
+        return best_sol, best_wct
+
+    def perturbation(self, gamma, solution):
+        for i in range(gamma):
+            i, j = random.sample(set(range(len(solution))), 2)
+            temp = solution.pop(i)
+            solution.insert(j, temp)
+        return solution
+
+    def accept(self, sol, wct, best_sol, best_wct):
+        if wct < best_wct:
+            return True
+        return False

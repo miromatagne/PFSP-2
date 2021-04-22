@@ -118,29 +118,47 @@ if __name__ == '__main__':
     #     print("Weighted sum of Completion Times : ", wct)
     #     print("Execution time : %s seconds" % (time.time() - start_time))
     # arrange_rii_files()
-    t = time.time()
-    os.chdir("instances")
-    files = os.listdir()
-    files.sort()
-    probabilities = [0.2, 0.3, 0.4, 0.5]
-    for f in files:
-        processes = []
-        if "." not in f and f != "measures" and "100" in f:
-            for proba in probabilities:
-                for i in range(5):
-                    p = multiprocessing.Process(
-                        target=measure_rii, args=(i, proba, f, 350,))
-                    processes.append(p)
-                    p.start()
-        if "." not in f and f != "measures" and "50" in f:
-            for proba in probabilities:
-                for i in range(5):
-                    p = multiprocessing.Process(
-                        target=measure_rii, args=(i, proba, f, 150,))
-                    processes.append(p)
-                    p.start()
 
-        for process in processes:
-            process.join()
+    instance = Instance()
+    instance.read_data_from_file("./instances/50_20_01")
+    #sol, wct = instance.solve_ils(100)
+    #initial_solution = get_random_permutation(instance)
+    #sol, wct = instance.solve_rii(0.2, 20)
 
-    print(time.time() - t)
+    print(wct)
+
+    # t = time.time()
+    # os.chdir("instances")
+    # files = os.listdir()
+    # files.sort()
+    # probabilities = [0.1, 0.2, 0.3, 0.4, 0.5]
+    # for f in files:
+    #     processes = []
+    #     if "." not in f and f != "measures" and "100" in f:
+    #         for proba in probabilities:
+    #             for i in range(5):
+    #                 p = multiprocessing.Process(
+    #                     target=measure_rii, args=(i, proba, f, 350,))
+    #                 processes.append(p)
+    #                 p.start()
+    #     if "." not in f and f != "measures" and "50" in f:
+    #         for proba in probabilities:
+    #             for i in range(5):
+    #                 p = multiprocessing.Process(
+    #                     target=measure_rii, args=(i, proba, f, 150,))
+    #                 processes.append(p)
+    #                 p.start()
+
+    #     for process in processes:
+    #         process.join()
+
+    # arrange_rii_files()
+
+    # instance = Instance()
+    # instance.read_data_from_file("./instances/50_20_01")
+    # initial_solution = get_random_permutation(instance.get_nb_jobs())
+    # print("Initial solution : ", initial_solution)
+    # solution, wct = instance.solve_rii(initial_solution, 0.2, 10)
+    # print(wct)
+
+    #print(time.time() - t)
