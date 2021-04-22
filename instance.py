@@ -3,6 +3,7 @@
 """
 
 from neighbour import get_best_improvement_neighbour, get_first_improvement_neighbour, get_random_insert_neighbor
+from initial_solution import get_rz_heuristic
 import time
 import random
 
@@ -185,3 +186,15 @@ class Instance:
         #print("Random:", random_count)
         #print("Non random:", non_random_count)
         return best_solution, best_wct
+
+    def solve_ils(self):
+        start = time.process_time()
+        # Initial solution
+        initial_solution = get_rz_heuristic(self.nb_jobs)
+        # Local search
+
+        while time.process_time() < start + time_limit:
+            # Perturbation
+            # Local search
+            # Accept criterion
+            pass

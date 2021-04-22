@@ -91,16 +91,6 @@ def parse_args():
     return args.vnd, args.instance, pivoting, neighbourhood, initial_solution, args.measure, neighbourhood_order
 
 
-def test(filename):
-    instance = Instance()
-    instance.read_data_from_file(filename)
-    #initial_solution = get_random_permutation(instance.get_nb_jobs())
-    initial_solution = get_rz_heuristic(instance)
-    solution, wct = instance.solve_rii(initial_solution, 0.1, 350)
-    print(solution)
-    print(wct)
-
-
 if __name__ == '__main__':
     # vnd, filename, pivoting_arg, neighbourhood_arg, initial_solution_arg, measure, neighbourhood_order = parse_args()
     # if measure:
@@ -129,25 +119,28 @@ if __name__ == '__main__':
     #     print("Execution time : %s seconds" % (time.time() - start_time))
     # arrange_rii_files()
     t = time.time()
-    processes = []
     os.chdir("instances")
     files = os.listdir()
     files.sort()
+    probabilities = [0.2, 0.3, 0.4, 0.5]
     for f in files:
+        processes = []
         if "." not in f and f != "measures" and "100" in f:
-            for i in range(5):
-                p = multiprocessing.Process(
-                    target=measure_rii, args=(i, 0.1, f, 350,))
-                processes.append(p)
-                p.start()
+            for proba in probabilities:
+                for i in range(5):
+                    p = multiprocessing.Process(
+                        target=measure_rii, args=(i, proba, f, 350,))
+                    processes.append(p)
+                    p.start()
         if "." not in f and f != "measures" and "50" in f:
-            for i in range(5):
-                p = multiprocessing.Process(
-                    target=measure_rii, args=(i, 0.1, f, 150,))
-                processes.append(p)
-                p.start()
+            for proba in probabilities:
+                for i in range(5):
+                    p = multiprocessing.Process(
+                        target=measure_rii, args=(i, proba, f, 150,))
+                    processes.append(p)
+                    p.start()
 
-    for process in processes:
-        process.join()
+        for process in processes:
+            process.join()
 
     print(time.time() - t)
