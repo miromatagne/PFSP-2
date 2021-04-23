@@ -6,6 +6,7 @@ from neighbour import get_best_improvement_neighbour, get_first_improvement_neig
 from initial_solution import get_rz_heuristic, get_random_permutation
 import time
 import random
+import math
 
 FIRST_IMPROVEMENT = "FIRST_IMPROVEMENT"
 BEST_IMPROVEMENT = "BEST_IMPROVEMENT"
@@ -173,12 +174,12 @@ class Instance:
         while time.process_time() < start + time_limit:
             r = random.random()
             if r < probability:
-                #random_count += 1
+                # random_count += 1
                 # Pick random neighbor
                 sol = get_random_insert_neighbor(self, sol)
                 wct = self.compute_wct(sol)
             else:
-                #non_random_count += 1
+                # non_random_count += 1
                 # Pick first improving neighbor
                 wct = self.compute_wct(sol)
                 temp_sol, temp_wct = get_rii_insert_neighbor(
@@ -191,12 +192,14 @@ class Instance:
                 best_solution = sol.copy()
                 best_wct = wct
 
-        #print("Random:", random_count)
-        #print("Non random:", non_random_count)
+        # print("Random:", random_count)
+        # print("Non random:", non_random_count)
         return best_solution, best_wct
 
-    def solve_ils(self, time_limit):
+    def solve_ils(self, time_limit, gamma, lam):
         start = time.process_time()
+        temperature = self.compute_temperature(lam)
+        print("Temperature :", temperature)
         # Initial solution
         initial_solution = get_rz_heuristic(self)
         print(initial_solution)
@@ -207,13 +210,23 @@ class Instance:
 
         while time.process_time() < start + time_limit:
             # Perturbation
-            sol = self.perturbation(3, sol)
+            sol_prime = self.perturbation(gamma, sol)
             # Local search
-            sol, wct = self.solve_vnd(sol.copy(), SECOND_ORDER)
+            sol_vnd, wct_vnd = self.solve_vnd(sol_prime.copy(), SECOND_ORDER)
+            print(wct)
+            print(wct_vnd)
+            print(math.exp((wct-wct_vnd)/temperature))
+            if wct_vnd < wct:
+                print("1")
+                sol = sol_vnd.copy()
+                wct = wct_vnd
             # Accept criterion
-            if self.accept(sol, wct, best_sol, best_wct):
-                best_sol = sol.copy()
-                best_wct = wct
+                if wct < best_wct:
+                    best_sol = sol_vnd.copy()
+                    best_wct = wct_vnd
+            elif random.random() < math.exp((wct-wct_vnd)/temperature):
+                print("2")
+                sol = sol_vnd.copy()
 
         return best_sol, best_wct
 
@@ -224,7 +237,5 @@ class Instance:
             solution.insert(j, temp)
         return solution
 
-    def accept(self, sol, wct, best_sol, best_wct):
-        if wct < best_wct:
-            return True
-        return False
+    def compute_temperature(self, lam):
+        return lam*(sum(sum(self.processing_times_matrix[j][i] for i in range(self.nb_machines))*self.priority[j] for j in range(self.nb_jobs))/(10*self.nb_jobs*self.nb_machines))

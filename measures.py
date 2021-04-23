@@ -105,10 +105,7 @@ def measure_rii(i, p, f, time_limit):
                            f + "_" + str(i) + ".txt", "w")
         instance = Instance()
         instance.read_data_from_file(f)
-        initial_solution = get_random_permutation(
-            instance.get_nb_jobs())
-        print("Initial solution : ", initial_solution)
-        solution, wct = instance.solve_rii(initial_solution, p, time_limit)
+        solution, wct = instance.solve_rii(p, time_limit)
         output_file.write(str(wct) + "\n")
 
         print("Final job permutation : ", solution)
