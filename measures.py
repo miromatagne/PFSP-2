@@ -184,8 +184,9 @@ def get_experimental_results_ii():
 
 def arrange_rii_files():
     probabilities = [0.1, 0.2, 0.3, 0.4, 0.5]
+    os.chdir("Statistics/Measures/RII/Random/0.1/Raw")
     for p in probabilities:
-        os.chdir("Statistics/Measures/RII/Random/" + str(p) + "/Raw")
+        os.chdir("../../" + str(p) + "/Raw")
         files = os.listdir()
         files.sort()
         result_files = []
@@ -205,7 +206,7 @@ def arrange_rii_files():
                     indiv_file = open(f, "r")
                     indiv_line = indiv_file.readlines()
                     indiv_line = indiv_line[0]
-                    res_file = open("../Grouped" + f[:-6] + ".txt", "a+")
+                    res_file = open("../Grouped/" + f[:-6] + ".txt", "a+")
                     res_file.write(indiv_line)
                     indiv_file.close()
                     res_file.close()
