@@ -158,7 +158,7 @@ class Instance:
                 i = 0
         return sol, wct
 
-    def solve_rii(self, probability, time_limit):
+    def solve_rii(self, probability, time_limit, srz=False):
         """
             Solves the PFSP problem using Randomised Iterative Improvement and returns the solution.
 
@@ -166,7 +166,10 @@ class Instance:
             :return: the solution and the WCT
         """
         start = time.process_time()
-        sol = get_random_permutation(self.nb_jobs)
+        if srz:
+            sol = get_rz_heuristic(self)
+        else:
+            sol = get_random_permutation(self.nb_jobs)
         best_solution = sol.copy()
         best_wct = self.compute_wct(sol)
         random_count = 0

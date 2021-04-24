@@ -16,7 +16,7 @@ import random
 import argparse
 from instance import Instance
 from initial_solution import get_random_permutation, get_rz_heuristic
-from measures import measure_vnd_times, measure_ii_times, get_experimental_results_vnd, measure_rii, arrange_rii_files
+from measures import measure_vnd_times, measure_ii_times, get_experimental_results_vnd, measure_rii, arrange_rii_files, compute_rii_averages
 import time
 import os
 import multiprocessing
@@ -129,31 +129,31 @@ if __name__ == '__main__':
     #sol, wct = instance.solve_rii(0.2, 20)
 
     # print(wct)
-    arrange_rii_files()
-    # t = time.time()
-    # os.chdir("instances")
-    # files = os.listdir()
-    # files.sort()
-    # probabilities = [0.1, 0.2, 0.3, 0.4, 0.5]
-    # for f in files:
-    #     processes = []
-    #     if "." not in f and f != "measures" and "100" in f:
-    #         for proba in probabilities:
-    #             for i in range(5):
-    #                 p = multiprocessing.Process(
-    #                     target=measure_rii, args=(i, proba, f, 350,))
-    #                 processes.append(p)
-    #                 p.start()
-    #     if "." not in f and f != "measures" and "50" in f:
-    #         for proba in probabilities:
-    #             for i in range(5):
-    #                 p = multiprocessing.Process(
-    #                     target=measure_rii, args=(i, proba, f, 150,))
-    #                 processes.append(p)
-    #                 p.start()
+    # compute_rii_averages()
+    t = time.time()
+    os.chdir("instances")
+    files = os.listdir()
+    files.sort()
+    probabilities = [0.1, 0.2, 0.3, 0.4, 0.5]
+    for f in files:
+        processes = []
+        if "." not in f and f != "measures" and "100" in f:
+            for proba in probabilities:
+                for i in range(5):
+                    p = multiprocessing.Process(
+                        target=measure_rii, args=(i, proba, f, 350,))
+                    processes.append(p)
+                    p.start()
+        if "." not in f and f != "measures" and "50" in f:
+            for proba in probabilities:
+                for i in range(5):
+                    p = multiprocessing.Process(
+                        target=measure_rii, args=(i, proba, f, 150,))
+                    processes.append(p)
+                    p.start()
 
-    #     for process in processes:
-    #         process.join()
+        for process in processes:
+            process.join()
 
     # arrange_rii_files()
 
