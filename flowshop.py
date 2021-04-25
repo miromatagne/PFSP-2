@@ -16,7 +16,7 @@ import random
 import argparse
 from instance import Instance
 from initial_solution import get_random_permutation, get_rz_heuristic
-from measures import measure_vnd_times, measure_ii_times, get_experimental_results_vnd, measure_rii, arrange_rii_files, compute_rii_averages
+from measures import measure_vnd_times, measure_ii_times, get_experimental_results_vnd, measure_rii, arrange_rii_files, compute_rii_averages, measure_ils, arrange_ils_files, compute_ils_averages
 import time
 import os
 import multiprocessing
@@ -117,24 +117,25 @@ if __name__ == '__main__':
     #     print("Final job permutation : ", solution)
     #     print("Weighted sum of Completion Times : ", wct)
     #     print("Execution time : %s seconds" % (time.time() - start_time))
-    # arrange_rii_files()
+    # compute_rii_averages()
 
     # instance = Instance()
     # instance.read_data_from_file("./instances/100_20_01")
-    #a = instance.compute_temperature(4)
+    # a = instance.compute_temperature(20)
     # print(a)
-    #sol, wct = instance.solve_ils(200, 4, 20)
+    # sol, wct = instance.solve_ils(200, 20, 4)
     # print(wct)
-    #initial_solution = get_random_permutation(instance)
-    #sol, wct = instance.solve_rii(0.2, 20)
+
+    # initial_solution = get_random_permutation(instance)
+    # sol, wct = instance.solve_rii(0.2, 20)
 
     # print(wct)
     # compute_rii_averages()
-    t = time.time()
+    # t = time.time()
     os.chdir("instances")
     files = os.listdir()
     files.sort()
-    probabilities = [0.1, 0.2, 0.3, 0.4, 0.5]
+    probabilities = [0.02, 0.04, 0.06, 0.08]
     for f in files:
         processes = []
         if "." not in f and f != "measures" and "100" in f:
@@ -151,9 +152,33 @@ if __name__ == '__main__':
                         target=measure_rii, args=(i, proba, f, 150,))
                     processes.append(p)
                     p.start()
-
         for process in processes:
             process.join()
+
+    # t = time.time()
+    # os.chdir("instances")
+    # files = os.listdir()
+    # files.sort()
+    # lambdas = [10, 20, 30]
+    # for f in files:
+    #     processes = []
+    #     if "." not in f and f != "measures" and "100" in f:
+    #         for l in lambdas:
+    #             for i in range(5):
+    #                 p = multiprocessing.Process(
+    #                     target=measure_ils, args=(i, 6, l, f, 500,))
+    #                 processes.append(p)
+    #                 p.start()
+    #     if "." not in f and f != "measures" and "50" in f:
+    #         for l in lambdas:
+    #             for i in range(5):
+    #                 p = multiprocessing.Process(
+    #                     target=measure_ils, args=(i, 3, l, f, 150,))
+    #                 processes.append(p)
+    #                 p.start()
+
+    #     for process in processes:
+    #         process.join()
 
     # arrange_rii_files()
 
@@ -164,4 +189,4 @@ if __name__ == '__main__':
     # solution, wct = instance.solve_rii(initial_solution, 0.2, 10)
     # print(wct)
 
-    print(time.time() - t)
+    # print(time.time() - t)

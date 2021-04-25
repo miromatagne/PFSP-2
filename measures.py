@@ -116,6 +116,25 @@ def measure_rii(i, p, f, time_limit):
     return None
 
 
+def measure_ils(i, gamma, lam, f, time_limit):
+    """
+    """
+    if "." not in f and f != "Measures":
+        output_file = open("../Statistics/Measures/ILS/" + str(gamma) + "/" + str(lam) + "/Raw/" +
+                           f + "_" + str(i) + ".txt", "w")
+        instance = Instance()
+        instance.read_data_from_file(f)
+        solution, wct = instance.solve_ils(gamma, lam, time_limit)
+        output_file.write(str(wct) + "\n")
+
+        print("Final job permutation : ", solution)
+        print("Weighted sum of Completion Times : ", wct)
+        output_file.close()
+    else:
+        print(f)
+    return None
+
+
 def get_experimental_results_vnd():
     """
         Measure execution times and solutions for all instances, and group the results
@@ -184,7 +203,7 @@ def get_experimental_results_ii():
 
 def arrange_rii_files():
     probabilities = [0.1, 0.2, 0.3, 0.4, 0.5]
-    os.chdir("Statistics/Measures/RII/Random/0.1/Raw")
+    os.chdir("Statistics/Measures/RII/SRZ/0.1/Raw")
     for p in probabilities:
         os.chdir("../../" + str(p) + "/Raw")
         files = os.listdir()
@@ -214,7 +233,7 @@ def arrange_rii_files():
 
 def compute_rii_averages():
     probabilities = [0.1, 0.2, 0.3, 0.4, 0.5]
-    os.chdir("Statistics/Measures/RII/Random/0.1/Grouped")
+    os.chdir("Statistics/Measures/RII/SRZ/0.1/Grouped")
     for p in probabilities:
         os.chdir("../../" + str(p))
         average_file = open("average_" + str(p) + ".csv", "w")
@@ -234,3 +253,63 @@ def compute_rii_averages():
                 average_file.write(file_name[:-4] + "," + str(average) + "\n")
                 f.close()
         average_file.close()
+
+
+def arrange_ils_files():
+    lambdas = [10, 20, 30]
+    gammas = [3, 6]
+    os.chdir("Statistics/Measures/ILS/3/10/Raw")
+    for l in lambdas:
+        for g in gammas:
+            os.chdir("../../../" + str(g) + "/" + str(l) + "/Raw")
+            files = os.listdir()
+            files.sort()
+            result_files = []
+            for f in files:
+                if "DS" not in f:
+                    if f[:-6] not in result_files:
+                        indiv_file = open(f, "r")
+                        indiv_line = indiv_file.readlines()
+                        indiv_line = indiv_line[0]
+                        res_file = open("../Grouped/" + f[:-6] + ".txt", "w")
+                        res_file.write(indiv_line)
+                        result_files.append(f[:-6])
+                        indiv_file.close()
+                        res_file.close()
+                    else:
+                        print(f)
+                        indiv_file = open(f, "r")
+                        indiv_line = indiv_file.readlines()
+                        indiv_line = indiv_line[0]
+                        res_file = open("../Grouped/" + f[:-6] + ".txt", "a+")
+                        res_file.write(indiv_line)
+                        indiv_file.close()
+                        res_file.close()
+
+
+def compute_ils_averages():
+    lambdas = [10, 20, 30]
+    gammas = [3, 6]
+    os.chdir("Statistics/Measures/ILS/3/10/Grouped")
+    for l in lambdas:
+        for g in gammas:
+            os.chdir("../../../" + str(g) + "/" + str(l))
+            average_file = open("average_" + str(g) +
+                                "_" + str(l) + ".csv", "w")
+            average_file.write("instance,solution\n")
+            os.chdir("./Grouped")
+            files = os.listdir()
+            files.sort()
+            result_files = []
+            for file_name in files:
+                if "DS" not in file_name:
+                    f = open(file_name, "r")
+                    lines = f.readlines()
+                    total = 0
+                    for line in lines:
+                        total += int(line)
+                    average = total/len(lines)
+                    average_file.write(
+                        file_name[:-4] + "," + str(average) + "\n")
+                    f.close()
+            average_file.close()

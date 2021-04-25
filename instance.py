@@ -199,7 +199,7 @@ class Instance:
         # print("Non random:", non_random_count)
         return best_solution, best_wct
 
-    def solve_ils(self, time_limit, gamma, lam):
+    def solve_ils(self, gamma, lam, time_limit):
         start = time.process_time()
         temperature = self.compute_temperature(lam)
         print("Temperature :", temperature)
