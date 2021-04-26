@@ -132,28 +132,30 @@ if __name__ == '__main__':
     # print(wct)
     # compute_rii_averages()
     # t = time.time()
-    os.chdir("instances")
-    files = os.listdir()
-    files.sort()
-    probabilities = [0.02, 0.04, 0.06, 0.08]
-    for f in files:
-        processes = []
-        if "." not in f and f != "measures" and "100" in f:
-            for proba in probabilities:
-                for i in range(5):
-                    p = multiprocessing.Process(
-                        target=measure_rii, args=(i, proba, f, 350,))
-                    processes.append(p)
-                    p.start()
-        if "." not in f and f != "measures" and "50" in f:
-            for proba in probabilities:
-                for i in range(5):
-                    p = multiprocessing.Process(
-                        target=measure_rii, args=(i, proba, f, 150,))
-                    processes.append(p)
-                    p.start()
-        for process in processes:
-            process.join()
+    # os.chdir("instances")
+    # files = os.listdir()
+    # files.sort()
+    # probabilities = [0.02, 0.04, 0.06, 0.08]
+    # for f in files:
+    #     processes = []
+    #     if "." not in f and f != "measures" and "100" in f:
+    #         for proba in probabilities:
+    #             for i in range(5):
+    #                 p = multiprocessing.Process(
+    #                     target=measure_rii, args=(i, proba, f, 350,))
+    #                 processes.append(p)
+    #                 p.start()
+    #     if "." not in f and f != "measures" and "50" in f:
+    #         for proba in probabilities:
+    #             for i in range(5):
+    #                 p = multiprocessing.Process(
+    #                     target=measure_rii, args=(i, proba, f, 150,))
+    #                 processes.append(p)
+    #                 p.start()
+    #     for process in processes:
+    #         process.join()
+
+    compute_rii_averages()
 
     # t = time.time()
     # os.chdir("instances")
