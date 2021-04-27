@@ -216,11 +216,7 @@ class Instance:
             sol_prime = self.perturbation(gamma, sol)
             # Local search
             sol_vnd, wct_vnd = self.solve_vnd(sol_prime.copy(), SECOND_ORDER)
-            print(wct)
-            print(wct_vnd)
-            print(math.exp((wct-wct_vnd)/temperature))
             if wct_vnd < wct:
-                print("1")
                 sol = sol_vnd.copy()
                 wct = wct_vnd
             # Accept criterion
@@ -228,7 +224,7 @@ class Instance:
                     best_sol = sol_vnd.copy()
                     best_wct = wct_vnd
             elif random.random() < math.exp((wct-wct_vnd)/temperature):
-                print("2")
+                print("OKOKOKOOKKO")
                 sol = sol_vnd.copy()
 
         return best_sol, best_wct

@@ -256,8 +256,8 @@ def compute_rii_averages():
 
 
 def arrange_ils_files():
-    lambdas = [10, 20, 30]
-    gammas = [3, 6]
+    lambdas = [30]
+    gammas = [2, 4, 8, 10]
     os.chdir("Statistics/Measures/ILS/3/10/Raw")
     for l in lambdas:
         for g in gammas:
@@ -288,8 +288,8 @@ def arrange_ils_files():
 
 
 def compute_ils_averages():
-    lambdas = [10, 20, 30]
-    gammas = [3, 6]
+    lambdas = [30]
+    gammas = [2, 4, 8, 10]
     os.chdir("Statistics/Measures/ILS/3/10/Grouped")
     for l in lambdas:
         for g in gammas:
