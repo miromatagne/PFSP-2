@@ -160,30 +160,31 @@ if __name__ == '__main__':
     # compute_ils_averages()
 
     # t = time.time()
-    os.chdir("instances")
-    files = os.listdir()
-    files.sort()
-    gammas_100 = [2, 4, 8]
-    gammas_50 = [1]
-    for f in files:
-        processes = []
-        if "." not in f and f != "measures" and "100" in f:
-            for g in gammas_100:
-                for i in range(5):
-                    p = multiprocessing.Process(
-                        target=measure_ils, args=(i, g, 10, f, 500,))
-                    processes.append(p)
-                    p.start()
-        if "." not in f and f != "measures" and "50" in f:
-            for g in gammas_50:
-                for i in range(5):
-                    p = multiprocessing.Process(
-                        target=measure_ils, args=(i, g, 30, f, 150,))
-                    processes.append(p)
-                    p.start()
+    compute_ils_averages()
+    # os.chdir("instances")
+    # files = os.listdir()
+    # files.sort()
+    # gammas_100 = [2, 4, 8]
+    # gammas_50 = [1]
+    # for f in files:
+    #     processes = []
+    #     if "." not in f and f != "measures" and "100" in f:
+    #         for g in gammas_100:
+    #             for i in range(5):
+    #                 p = multiprocessing.Process(
+    #                     target=measure_ils, args=(i, g, 10, f, 500,))
+    #                 processes.append(p)
+    #                 p.start()
+    #     if "." not in f and f != "measures" and "50" in f:
+    #         for g in gammas_50:
+    #             for i in range(5):
+    #                 p = multiprocessing.Process(
+    #                     target=measure_ils, args=(i, g, 30, f, 150,))
+    #                 processes.append(p)
+    #                 p.start()
 
-        for process in processes:
-            process.join()
+    #     for process in processes:
+    #         process.join()
 
     # arrange_rii_files()
     # instance = Instance()
