@@ -313,3 +313,11 @@ def compute_ils_averages():
                         file_name[:-4] + "," + str(average) + "\n")
                     f.close()
             average_file.close()
+
+    def measure_rii_rtd(f, p, time_limit):
+        instance = Instance()
+        instance.read_data_from_file(f)
+        solution, wct = instance.solve_rii(p, time_limit, srz=True)
+
+        print("Final job permutation : ", solution)
+        print("Weighted sum of Completion Times : ", wct)

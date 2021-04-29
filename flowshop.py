@@ -185,10 +185,11 @@ if __name__ == '__main__':
     # for process in processes:
     #     process.join()
 
-    compute_ils_averages()
-    # instance = Instance()
-    # instance.read_data_from_file("./instances/50_20_01")
-    # solution, wct = instance.solve_ils(3, 30, 150)
+    instance = Instance()
+    instance.read_data_from_file("./instances/50_20_01")
+    solution, wct = instance.solve_rii(
+        0.04, 60, srz=True, rtd_file="rtd_50_20_01.csv")
+    print(wct)
 
     # instance = Instance()
     # instance.read_data_from_file("./instances/50_20_01")

@@ -158,13 +158,16 @@ class Instance:
                 i = 0
         return sol, wct
 
-    def solve_rii(self, probability, time_limit, srz=False):
+    def solve_rii(self, probability, time_limit, srz=False, rtd_file=None):
         """
             Solves the PFSP problem using Randomised Iterative Improvement and returns the solution.
 
             :param solution: initial solution used to start the algorithm
             :return: the solution and the WCT
         """
+        if rtd_file:
+            output_file = open(rtd_file, "w")
+            output_file.write("time,solution\n")
         start = time.process_time()
         if srz:
             sol = get_rz_heuristic(self)
@@ -172,6 +175,9 @@ class Instance:
             sol = get_random_permutation(self.nb_jobs)
         best_solution = sol.copy()
         best_wct = self.compute_wct(sol)
+        if rtd_file:
+            output_file.write(
+                str(time.process_time()-start) + "," + str(best_wct) + "\n")
         random_count = 0
         non_random_count = 0
         while time.process_time() < start + time_limit:
@@ -194,7 +200,11 @@ class Instance:
                 # print(best_wct)
                 best_solution = sol.copy()
                 best_wct = wct
-
+                if rtd_file:
+                    output_file.write(
+                        str(time.process_time()-start) + "," + str(best_wct) + "\n")
+        if rtd_file:
+            output_file.close()
         # print("Random:", random_count)
         # print("Non random:", non_random_count)
         return best_solution, best_wct
