@@ -290,7 +290,7 @@ def arrange_ils_files():
 def compute_ils_averages():
     lambdas = [40, 50, 60]
     gammas = [1]
-    os.chdir("Statistics/Measures/ILS/3/10/Grouped")
+    os.chdir("Statistics/Measures/ILS/1/30/Grouped")
     for l in lambdas:
         for g in gammas:
             os.chdir("../../../" + str(g) + "/" + str(l))
@@ -302,7 +302,7 @@ def compute_ils_averages():
             files.sort()
             result_files = []
             for file_name in files:
-                if "DS" not in file_name and "100" in file_name:
+                if "DS" not in file_name:
                     f = open(file_name, "r")
                     lines = f.readlines()
                     total = 0

@@ -1,6 +1,6 @@
 this.dir <- dirname(parent.frame(2)$ofile)
 setwd(this.dir)
-gammas <- c(2,4,6,8)
+gammas <- c(2,4,8,10)
 best.known <- read.csv("bestSolutions.txt")
 best.known.50 <- subset(best.known,grepl("50",oiiProblem))
 best.known.100 <- subset(best.known,grepl("100",oiiProblem))
@@ -10,15 +10,15 @@ deviations.100 <- c()
 
 for(g in gammas) {
   print("Lambda = 30 (50 jobs) :")
-  average.file <- read.csv(paste("./Measures/ILS/",g,"/10/average_",g,"_10.csv",sep=''))
-  percentage.deviation <- 100 * (average.file$solution-best.known.50$BS) / best.known.50$BS
+  average.file <- read.csv(paste("./Measures/ILS/",g,"/30/average_",g,"_30.csv",sep=''))
+  percentage.deviation <- 100 * (average.file$solution-best.known$BS) / best.known$BS
   print(paste("Gamma :",g))
   print(paste("Average percentage deviation :"))
   print(mean(percentage.deviation))
   
-  #df <- cbind(average.file$instance,percentage.deviation)
-  #colnames(df) <- c("Instance", "Percentage deviation")
-  #write.csv(df,paste("./rii_random_",p,".csv",sep=''), row.names = FALSE)
+  df <- cbind(average.file$instance,percentage.deviation)
+  colnames(df) <- c("Instance", "Percentage deviation")
+  write.csv(df,paste("./ils_lambda_30_gamma_",g,".csv",sep=''), row.names = FALSE)
   
   average.file.50 <- subset(average.file,grepl("50",instance))
   average.file.100 <- subset(average.file,grepl("100",instance))
@@ -33,9 +33,9 @@ for(g in gammas) {
 }
 par(mar=c(5,6,4,1)+.1)
 
-x <- barplot(deviations.50,names.arg=gammas,col="lightblue",main="Percentage deviations for 50 jobs (lambda = 30)", ylab="Percentage deviation (%)",ylim=c(0,6),cex.lab=2.5,cex.main=3,cex.axis=2,cex.names=2.5)
+x <- barplot(deviations.50,names.arg=gammas,col="lightblue",main="Percentage deviations for 50 jobs (gamma = 1)", ylab="Percentage deviation (%)",ylim=c(0,2),cex.lab=2.5,cex.main=3,cex.axis=2,cex.names=2.5)
 y <- as.matrix(deviations.50)
-text(x,y+0.3,labels=as.character(round(y,digits=2)),cex=4)
+text(x,y+0.1,labels=as.character(round(y,digits=2)),cex=4)
 
 x <- barplot(deviations.100,names.arg=gammas,col="lightblue",main="Percentage deviations for 100 jobs (lambda = 10)", ylab="Percentage deviation (%)",ylim=c(0,6),cex.lab=2.5,cex.main=3,cex.axis=2,cex.names=2.5)
 y <- as.matrix(deviations.100)
