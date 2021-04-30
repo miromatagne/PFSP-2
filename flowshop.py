@@ -16,7 +16,7 @@ import random
 import argparse
 from instance import Instance
 from initial_solution import get_random_permutation, get_rz_heuristic
-from measures import measure_vnd_times, measure_ii_times, get_experimental_results_vnd, measure_rii, arrange_rii_files, compute_rii_averages, measure_ils, arrange_ils_files, compute_ils_averages
+from measures import measure_vnd_times, measure_ii_times, get_experimental_results_vnd, measure_rii, arrange_rii_files, compute_rii_averages, measure_ils, arrange_ils_files, compute_ils_averages, measure_rii_rtd, measure_ils_rtd
 import time
 import os
 import multiprocessing
@@ -185,11 +185,30 @@ if __name__ == '__main__':
     # for process in processes:
     #     process.join()
 
-    instance = Instance()
-    instance.read_data_from_file("./instances/50_20_01")
-    solution, wct = instance.solve_rii(
-        0.04, 60, srz=True, rtd_file="rtd_50_20_01.csv")
-    print(wct)
+    rtd_files = ["./instances/50_20_01", "./instances/50_20_02"]
+    for f in rtd_files:
+        processes = []
+        for j in range(2):
+            for i in range(13):
+                p = multiprocessing.Process(
+                    target=measure_rii_rtd, args=((i+1)*(j+1), f, 0.04, 1000,))
+                processes.append(p)
+                p.start()
+
+            for process in processes:
+                process.join()
+
+    for f in rtd_files:
+        processes = []
+        for j in range(2):
+            for i in range(13):
+                p = multiprocessing.Process(
+                    target=measure_rii_rtd, args=((i+1)*(j+1), f, 0.04, 1000,))
+                processes.append(p)
+                p.start()
+
+            for process in processes:
+                process.join()
 
     # instance = Instance()
     # instance.read_data_from_file("./instances/50_20_01")

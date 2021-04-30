@@ -314,10 +314,22 @@ def compute_ils_averages():
                     f.close()
             average_file.close()
 
-    def measure_rii_rtd(f, p, time_limit):
-        instance = Instance()
-        instance.read_data_from_file(f)
-        solution, wct = instance.solve_rii(p, time_limit, srz=True)
 
-        print("Final job permutation : ", solution)
-        print("Weighted sum of Completion Times : ", wct)
+def measure_rii_rtd(i, f, p, time_limit):
+    instance = Instance()
+    instance.read_data_from_file(f)
+    solution, wct = instance.solve_rii(
+        p, time_limit, srz=True, rtd_file="rtd_rii_" + f[12:] + "_" + str(i) + ".csv")
+
+    print("Final job permutation : ", solution)
+    print("Weighted sum of Completion Times : ", wct)
+
+
+def measure_ils_rtd(i, f, gamma, lam, time_limit):
+    instance = Instance()
+    instance.read_data_from_file(f)
+    solution, wct = instance.solve_ils(
+        gamma, lam, time_limit, rtd_file="rtd_ils_" + f[12:] + "_" + str(i) + ".csv")
+
+    print("Final job permutation : ", solution)
+    print("Weighted sum of Completion Times : ", wct)

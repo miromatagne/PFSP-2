@@ -165,9 +165,6 @@ class Instance:
             :param solution: initial solution used to start the algorithm
             :return: the solution and the WCT
         """
-        if rtd_file:
-            output_file = open(rtd_file, "w")
-            output_file.write("time,solution\n")
         start = time.process_time()
         if srz:
             sol = get_rz_heuristic(self)
@@ -176,6 +173,8 @@ class Instance:
         best_solution = sol.copy()
         best_wct = self.compute_wct(sol)
         if rtd_file:
+            output_file = open(rtd_file, "w")
+            output_file.write("time,solution\n")
             output_file.write(
                 str(time.process_time()-start) + "," + str(best_wct) + "\n")
         random_count = 0
@@ -209,7 +208,7 @@ class Instance:
         # print("Non random:", non_random_count)
         return best_solution, best_wct
 
-    def solve_ils(self, gamma, lam, time_limit):
+    def solve_ils(self, gamma, lam, time_limit, rtd_file=None):
         start = time.process_time()
         temperature = self.compute_temperature(lam)
         print("Temperature :", temperature)
@@ -220,6 +219,11 @@ class Instance:
         sol, wct = self.solve_vnd(initial_solution, SECOND_ORDER)
         best_sol = sol.copy()
         best_wct = wct
+        if rtd_file:
+            output_file = open(rtd_file, "w")
+            output_file.write("time,solution\n")
+            output_file.write(
+                str(time.process_time()-start) + "," + str(best_wct) + "\n")
 
         while time.process_time() < start + time_limit:
             # Perturbation
@@ -233,10 +237,13 @@ class Instance:
                 if wct < best_wct:
                     best_sol = sol_vnd.copy()
                     best_wct = wct_vnd
+                    if rtd_file:
+                        output_file.write(
+                            str(time.process_time()-start) + "," + str(best_wct) + "\n")
             elif random.random() < math.exp((wct-wct_vnd)/temperature):
-                print("OKOKOKOOKKO")
                 sol = sol_vnd.copy()
-
+        if rtd_file:
+            output_file.close()
         return best_sol, best_wct
 
     def perturbation(self, gamma, solution):
