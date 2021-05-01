@@ -191,7 +191,7 @@ if __name__ == '__main__':
         for j in range(2):
             for i in range(13):
                 p = multiprocessing.Process(
-                    target=measure_rii_rtd, args=((i+1)*(j+1), f, 0.04, 1000,))
+                    target=measure_rii_rtd, args=((i*13)+j, f, 0.04, 1000,))
                 processes.append(p)
                 p.start()
 
@@ -203,7 +203,7 @@ if __name__ == '__main__':
         for j in range(2):
             for i in range(13):
                 p = multiprocessing.Process(
-                    target=measure_rii_rtd, args=((i+1)*(j+1), f, 0.04, 1000,))
+                    target=measure_ils_rtd, args=((i*13)+j, f, 1, 30, 1000,))
                 processes.append(p)
                 p.start()
 
