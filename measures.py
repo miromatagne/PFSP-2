@@ -232,8 +232,8 @@ def arrange_rii_files():
 
 
 def compute_rii_averages():
-    probabilities = [0.02, 0.04, 0.06, 0.08]
-    os.chdir("Statistics/Measures/RII/SRZ/0.1/Grouped")
+    probabilities = [0.1, 0.2, 0.3]
+    os.chdir("Statistics/Measures/RII/SRZ/Exchange/0.1/Grouped")
     for p in probabilities:
         os.chdir("../../" + str(p))
         average_file = open("average_" + str(p) + ".csv", "w")

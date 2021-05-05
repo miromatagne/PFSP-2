@@ -155,9 +155,9 @@ if __name__ == '__main__':
     #     for process in processes:
     #         process.join()
 
-    arrange_rii_files()
+    # arrange_rii_files()
 
-    # compute_rii_averages()
+    compute_rii_averages()
 
     # compute_ils_averages()
 
