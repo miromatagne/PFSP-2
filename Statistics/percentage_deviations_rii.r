@@ -1,6 +1,6 @@
 this.dir <- dirname(parent.frame(2)$ofile)
 setwd(this.dir)
-probabilities <- c(0.02,0.04,0.06,0.08)
+probabilities <- c(0.1,0.2,0.3)
 best.known <- read.csv("bestSolutions.txt")
 best.known.50 <- subset(best.known,grepl("50",oiiProblem))
 best.known.100 <- subset(best.known,grepl("100",oiiProblem))
@@ -12,7 +12,7 @@ deviations.100 <- c()
 
 for(p in probabilities) {
   print("SRZ initial solution :")
-  average.file <- read.csv(paste("./Measures/RII/SRZ/",p,"/average_",p,".csv",sep=''))
+  average.file <- read.csv(paste("./Measures/RII/SRZ/Exchange/",p,"/average_",p,".csv",sep=''))
   percentage.deviation <- 100 * (average.file$solution-best.known$BS) / best.known$BS
   print(paste("Probability :",p))
   print(paste("Average percentage deviation :"))
@@ -34,11 +34,14 @@ for(p in probabilities) {
   deviations.100 <- c(deviations.100,mean(percentage.deviation.100))
 }
 
-x <- barplot(deviations.50,names.arg=probabilities,col="lightblue",main="Percentage deviations for 50 jobs", ylab="Percentage deviation (%)",ylim=c(0,3),cex.lab=2.5,cex.main=4,cex.axis=2,cex.names=2.5)
+par(mar=c(5,6,4,1)+.1)
+
+
+x <- barplot(deviations.50,names.arg=probabilities,col="lightblue",main="Percentage deviations for 50 jobs (Exchange)", ylab="Percentage deviation (%)",ylim=c(0,6),cex.lab=2.5,cex.main=3,cex.axis=2,cex.names=2.5)
 y <- as.matrix(deviations.50)
 text(x,y+0.2,labels=as.character(round(y,digits=2)),cex=4)
 
-x <- barplot(deviations.100,names.arg=probabilities,col="lightblue",main="Percentage deviations for 100 jobs", ylab="Percentage deviation (%)",ylim=c(0,6),cex.lab=2.5,cex.main=4,cex.axis=2,cex.names=2.5)
+x <- barplot(deviations.100,names.arg=probabilities,col="lightblue",main="Percentage deviations for 100 jobs (Exchange)", ylab="Percentage deviation (%)",ylim=c(0,6),cex.lab=2.5,cex.main=3,cex.axis=2,cex.names=2.5)
 y <- as.matrix(deviations.100)
 text(x,y+0.3,labels=as.character(round(y,digits=2)),cex=4)
 
