@@ -132,6 +132,12 @@ def get_random_insert_neighbor(instance, solution):
     return solution
 
 
+def get_random_exchange_neighbor(instance, solution):
+    i, j = random.sample(set(range(len(solution))), 2)
+    solution[i], solution[j] = solution[i], solution[j]
+    return solution
+
+
 def get_rii_insert_neighbor(instance, solution, initial_wct):
     best_non_improving_sol = None
     best_non_improving_wct = float('inf')
@@ -148,4 +154,20 @@ def get_rii_insert_neighbor(instance, solution, initial_wct):
                 best_non_improving_wct = wct
             if j != len(solution) - 1:
                 temp_sol[j], temp_sol[j+1] = temp_sol[j+1], temp_sol[j]
+    return best_non_improving_sol, best_non_improving_wct
+
+
+def get_rii_exchange_neighbor(instance, solution, initial_wct):
+    best_non_improving_sol = None
+    best_non_improving_wct = float('inf')
+    for i in range(len(solution)-1):
+        for j in range(i+1, len(solution)):
+            solution[i], solution[j] = solution[j], solution[i]
+            wct = instance.compute_wct(solution)
+            if wct < initial_wct:
+                return solution, wct
+            elif wct < best_non_improving_wct:
+                best_non_improving_sol = solution.copy()
+                best_non_improving_wct = wct
+            solution[i], solution[j] = solution[j], solution[i]
     return best_non_improving_sol, best_non_improving_wct

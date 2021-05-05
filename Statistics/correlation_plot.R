@@ -26,13 +26,15 @@ par(mar=c(5,6,4,1)+.1)
 
 plot(rii.percentage.deviation.50,ils.percentage.deviation.50,xlim = c(0,3),ylim = c(0,3),pch=19,main="Correlation plot comparing RII and ILS on instances of 50 jobs",xlab="Average Relative Percentage Deviation RII [%]",ylab="Average Relative Percentage deviation ILS [%]")
 abline(a=0,b=1,col="red",lwd=3)
-text(paste("Correlation:", round(cor(rii.percentage.deviation.50, ils.percentage.deviation.50,method = "spearman"), 2)), x = 1, y = 2)
+abline(lm(ils.percentage.deviation.50 ~ rii.percentage.deviation.50),col="darkblue",lwd=3)
+text(paste("Correlation:", round(cor(rii.percentage.deviation.50, ils.percentage.deviation.50,method = "spearman"), 2)), x = 0.5, y = 2)
 
 cor.test(rii.percentage.deviation.50, ils.percentage.deviation.50,method="spearman")
 
 plot(rii.percentage.deviation.100,ils.percentage.deviation.100,xlim = c(0,4),ylim = c(0,4),pch=19,main="Correlation plot comparing RII and ILS on instances of 100 jobs",xlab="Average Relative Percentage deviation RII [%]",ylab="Average Relative Percentage deviation ILS [%]")
 abline(a=0,b=1,col="red",lwd=3)
-text(paste("Correlation:", round(cor(rii.percentage.deviation.100, ils.percentage.deviation.100,method = "spearman"), 2)), x = 1, y = 2)
+abline(lm(ils.percentage.deviation.100 ~ rii.percentage.deviation.100),col="darkblue",lwd=3)
+text(paste("Correlation:", round(cor(rii.percentage.deviation.100, ils.percentage.deviation.100,method = "spearman"), 2)), x = 1, y = 3)
 
 cor.test(rii.percentage.deviation.100, ils.percentage.deviation.100,method="spearman")
 

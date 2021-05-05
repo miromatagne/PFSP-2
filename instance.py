@@ -2,7 +2,7 @@
     PFSP instance file
 """
 
-from neighbour import get_best_improvement_neighbour, get_first_improvement_neighbour, get_random_insert_neighbor, get_rii_insert_neighbor
+from neighbour import get_best_improvement_neighbour, get_first_improvement_neighbour, get_random_insert_neighbor, get_rii_insert_neighbor, get_random_exchange_neighbor, get_rii_exchange_neighbor
 from initial_solution import get_rz_heuristic, get_random_permutation
 import time
 import random
@@ -184,13 +184,14 @@ class Instance:
             if r < probability:
                 # random_count += 1
                 # Pick random neighbor
-                sol = get_random_insert_neighbor(self, sol)
+                #sol = get_random_insert_neighbor(self, sol)
+                sol = get_random_exchange_neighbor(self, sol)
                 wct = self.compute_wct(sol)
             else:
                 # non_random_count += 1
                 # Pick first improving neighbor
                 wct = self.compute_wct(sol)
-                temp_sol, temp_wct = get_rii_insert_neighbor(
+                temp_sol, temp_wct = get_rii_exchange_neighbor(
                     self, sol.copy(), wct)
                 if temp_sol is not None:
                     sol = temp_sol.copy()

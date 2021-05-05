@@ -135,7 +135,7 @@ if __name__ == '__main__':
     # os.chdir("instances")
     # files = os.listdir()
     # files.sort()
-    # probabilities = [0.02, 0.04, 0.06, 0.08]
+    # probabilities = [0.1, 0.2, 0.3]
     # for f in files:
     #     processes = []
     #     if "." not in f and f != "measures" and "100" in f:
@@ -154,6 +154,8 @@ if __name__ == '__main__':
     #                 p.start()
     #     for process in processes:
     #         process.join()
+
+    arrange_rii_files()
 
     # compute_rii_averages()
 
@@ -185,30 +187,30 @@ if __name__ == '__main__':
     # for process in processes:
     #     process.join()
 
-    rtd_files = ["./instances/50_20_01", "./instances/50_20_02"]
-    for f in rtd_files:
-        processes = []
-        for j in range(2):
-            for i in range(13):
-                p = multiprocessing.Process(
-                    target=measure_rii_rtd, args=((i*13)+j, f, 0.04, 1000,))
-                processes.append(p)
-                p.start()
+    # rtd_files = ["./instances/50_20_01", "./instances/50_20_02"]
+    # for f in rtd_files:
+    #     processes = []
+    #     for j in range(2):
+    #         for i in range(13):
+    #             p = multiprocessing.Process(
+    #                 target=measure_rii_rtd, args=((i*13)+j, f, 0.04, 1000,))
+    #             processes.append(p)
+    #             p.start()
 
-            for process in processes:
-                process.join()
+    #         for process in processes:
+    #             process.join()
 
-    for f in rtd_files:
-        processes = []
-        for j in range(2):
-            for i in range(13):
-                p = multiprocessing.Process(
-                    target=measure_ils_rtd, args=((i*13)+j, f, 1, 30, 1000,))
-                processes.append(p)
-                p.start()
+    # for f in rtd_files:
+    #     processes = []
+    #     for j in range(2):
+    #         for i in range(13):
+    #             p = multiprocessing.Process(
+    #                 target=measure_ils_rtd, args=((i*13)+j, f, 1, 30, 1000,))
+    #             processes.append(p)
+    #             p.start()
 
-            for process in processes:
-                process.join()
+    #         for process in processes:
+    #             process.join()
 
     # instance = Instance()
     # instance.read_data_from_file("./instances/50_20_01")

@@ -101,7 +101,7 @@ def measure_rii(i, p, f, time_limit):
     """
     """
     if "." not in f and f != "Measures":
-        output_file = open("../Statistics/Measures/RII/SRZ/" + str(p) + "/Raw/" +
+        output_file = open("../Statistics/Measures/RII/SRZ/Exchange/" + str(p) + "/Raw/" +
                            f + "_" + str(i) + ".txt", "w")
         instance = Instance()
         instance.read_data_from_file(f)
@@ -202,8 +202,8 @@ def get_experimental_results_ii():
 
 
 def arrange_rii_files():
-    probabilities = [0.02, 0.04, 0.06, 0.08]
-    os.chdir("Statistics/Measures/RII/SRZ/0.1/Raw")
+    probabilities = [0.1, 0.2, 0.3]
+    os.chdir("Statistics/Measures/RII/SRZ/Exchange/0.1/Raw")
     for p in probabilities:
         os.chdir("../../" + str(p) + "/Raw")
         files = os.listdir()
