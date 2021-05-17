@@ -2,14 +2,11 @@
     PFSP instance file
 """
 
-from neighbour import get_best_improvement_neighbour, get_first_improvement_neighbour, get_random_insert_neighbor, get_rii_insert_neighbor, get_random_exchange_neighbor, get_rii_exchange_neighbor
+from neighbour import get_first_improvement_neighbour, get_random_insert_neighbor, get_rii_insert_neighbor, get_random_exchange_neighbor, get_rii_exchange_neighbor
 from initial_solution import get_rz_heuristic, get_random_permutation
 import time
 import random
 import math
-
-FIRST_IMPROVEMENT = "FIRST_IMPROVEMENT"
-BEST_IMPROVEMENT = "BEST_IMPROVEMENT"
 
 TRANSPOSE = "TRANSPOSE"
 EXCHANGE = "EXCHANGE"
@@ -17,9 +14,6 @@ INSERT = "INSERT"
 
 FIRST_ORDER = [TRANSPOSE, EXCHANGE, INSERT]
 SECOND_ORDER = [TRANSPOSE, INSERT, EXCHANGE]
-
-
-INSERT = "INSERT"
 
 
 class Instance:
@@ -104,37 +98,6 @@ class Instance:
             sorted(weights.items(), key=lambda item: item[1]))
         return sorted_weighed_sum.keys()
 
-    def solve_ii(self, solution, pivoting_rule, neighbourhood_method):
-        """
-            Solves the PSFP problem using Iterative Improvement and returns the solution.
-
-            :param solution: initial solution used to start the algorithm
-            :param pivoting_rule: pivoting rule used during the algorithm (LEAST_IMPROVEMENT or BEST_IMPORVEMENT)
-            :param neighborhood_rule: neighborhood rule used during the algorithm (EXCHANGE, TRASPOSE or INSERT)
-            :return: the solution and the associated WCT
-        """
-        initial_wct = self.compute_wct(solution)
-        if pivoting_rule == FIRST_IMPROVEMENT:
-            sol, wct = solution, initial_wct
-            while True:
-                temp_sol, temp_wct = get_first_improvement_neighbour(
-                    self, sol, wct, neighbourhood_method)
-                if not temp_sol:
-                    if wct == 0:
-                        wct = temp_wct
-                    return sol, wct
-                sol, wct = temp_sol, temp_wct
-        else:
-            sol, wct = solution, initial_wct
-            while True:
-                temp_sol, temp_wct = get_best_improvement_neighbour(
-                    self, sol, wct, neighbourhood_method)
-                if not temp_sol:
-                    if wct == 0:
-                        wct = temp_wct
-                    return sol, wct
-                sol, wct = temp_sol, temp_wct
-
     def solve_vnd(self, solution, neighbourhood_order):
         """
             Solves the PSFP problem using Variable Neighborhood Descent and returns the solution.
@@ -158,13 +121,18 @@ class Instance:
                 i = 0
         return sol, wct
 
-    def solve_rii(self, probability, time_limit, srz=False, rtd_file=None):
+    def solve_rii(self, probability, time_limit, srz=True, rtd_file=None):
         """
             Solves the PFSP problem using Randomised Iterative Improvement and returns the solution.
 
-            :param solution: initial solution used to start the algorithm
+            :param probability: walk probability wp
+            :param time_limit: execution time termination criterion
+            :param srz: True if the initial solutuon to use is SRZ
+            :param rtd_file: name of the file where we want to store data related to the construction of a
+                             Qualified Runtime Distribution (optional)
             :return: the solution and the WCT
         """
+        # Start counting the time for the termination criterion
         start = time.process_time()
         if srz:
             sol = get_rz_heuristic(self)
@@ -172,23 +140,20 @@ class Instance:
             sol = get_random_permutation(self.nb_jobs)
         best_solution = sol.copy()
         best_wct = self.compute_wct(sol)
+        # Write data useful for the QRTD
         if rtd_file:
             output_file = open(rtd_file, "w")
             output_file.write("time,solution\n")
             output_file.write(
                 str(time.process_time()-start) + "," + str(best_wct) + "\n")
-        random_count = 0
-        non_random_count = 0
+        # While the termination criterion is not met
         while time.process_time() < start + time_limit:
             r = random.random()
             if r < probability:
-                # random_count += 1
-                # Pick random neighbor
-                #sol = get_random_insert_neighbor(self, sol)
-                sol = get_random_exchange_neighbor(self, sol)
+                # Pick random neighbor with probability wp
+                sol = get_random_insert_neighbor(self, sol)
                 wct = self.compute_wct(sol)
             else:
-                # non_random_count += 1
                 # Pick first improving neighbor
                 wct = self.compute_wct(sol)
                 temp_sol, temp_wct = get_rii_exchange_neighbor(
@@ -196,8 +161,8 @@ class Instance:
                 if temp_sol is not None:
                     sol = temp_sol.copy()
                     wct = temp_wct
+            # Keep track of the best solution
             if wct < best_wct:
-                # print(best_wct)
                 best_solution = sol.copy()
                 best_wct = wct
                 if rtd_file:
@@ -205,17 +170,26 @@ class Instance:
                         str(time.process_time()-start) + "," + str(best_wct) + "\n")
         if rtd_file:
             output_file.close()
-        # print("Random:", random_count)
-        # print("Non random:", non_random_count)
         return best_solution, best_wct
 
     def solve_ils(self, gamma, lam, time_limit, rtd_file=None):
+        """
+            Solves the PFSP problem using Iterated Local Search and returns the solution.
+
+            :param gamma: gamma parameter of the ILS
+            :param lam: lambda parameter of the ILS
+            :param time_limit: execution time termination criterion
+            :param rtd_file: name of the file where we want to store data related to the construction of a
+                             Qualified Runtime Distribution (optional)
+            :return: the solution and the WCT
+        """
+        # Start counting the time for the termination criterion
         start = time.process_time()
+        # Compute the temperature
         temperature = self.compute_temperature(lam)
         print("Temperature :", temperature)
-        # Initial solution
+        # SRZ initial solution
         initial_solution = get_rz_heuristic(self)
-        print(initial_solution)
         # Local search
         sol, wct = self.solve_vnd(initial_solution, SECOND_ORDER)
         best_sol = sol.copy()
@@ -225,7 +199,7 @@ class Instance:
             output_file.write("time,solution\n")
             output_file.write(
                 str(time.process_time()-start) + "," + str(best_wct) + "\n")
-
+        # While the termination criterion is not met
         while time.process_time() < start + time_limit:
             # Perturbation
             sol_prime = self.perturbation(gamma, sol)
@@ -234,7 +208,7 @@ class Instance:
             if wct_vnd < wct:
                 sol = sol_vnd.copy()
                 wct = wct_vnd
-            # Accept criterion
+            # Acceptance criterion
                 if wct < best_wct:
                     best_sol = sol_vnd.copy()
                     best_wct = wct_vnd
@@ -248,6 +222,14 @@ class Instance:
         return best_sol, best_wct
 
     def perturbation(self, gamma, solution):
+        """
+            Applies a perturbation in the case of the ILS algorithm. It just picks a random job
+            and insterts it at a random position in the solution, gamma times.
+
+            :param gamma: gamma parameter of the ILS
+            :param solution: actual job ordering
+            :return: the modified solution, after applying the perturbation
+        """
         for i in range(gamma):
             i, j = random.sample(set(range(len(solution))), 2)
             temp = solution.pop(i)
@@ -255,4 +237,10 @@ class Instance:
         return solution
 
     def compute_temperature(self, lam):
+        """
+            Computes the temerature used in the ILS algorithm. 
+
+            :param lam: lambda parameter of the ILS
+            :return: the temperature
+        """
         return lam*(sum(sum(self.processing_times_matrix[j][i] for i in range(self.nb_machines))*self.priority[j] for j in range(self.nb_jobs))/(10*self.nb_jobs*self.nb_machines))

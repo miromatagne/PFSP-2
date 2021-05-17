@@ -14,7 +14,6 @@ def get_random_permutation(nb_jobs):
         :return: random permutation of the jobs
     """
     print("Started generating random initial solution...")
-    # random.seed(5)
     job_numbers = list(range(nb_jobs))
     random.shuffle(job_numbers)
     return job_numbers

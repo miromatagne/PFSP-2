@@ -16,23 +16,13 @@ import random
 import argparse
 from instance import Instance
 from initial_solution import get_random_permutation, get_rz_heuristic
-from measures import measure_vnd_times, measure_ii_times, get_experimental_results_vnd, measure_rii, arrange_rii_files, compute_rii_averages, measure_ils, arrange_ils_files, compute_ils_averages, measure_rii_rtd, measure_ils_rtd
+from measures import arrange_rii_files, compute_rii_averages, measure_ils, arrange_ils_files, compute_ils_averages, measure_rii_rtd, measure_ils_rtd
 import time
 import os
 import multiprocessing
 
-FIRST_IMPROVEMENT = "FIRST_IMPROVEMENT"
-BEST_IMPROVEMENT = "BEST_IMPROVEMENT"
-
-TRANSPOSE = "TRANSPOSE"
-EXCHANGE = "EXCHANGE"
-INSERT = "INSERT"
-
-SRZ = "SRZ"
-RANDOM_INIT = "RANDOM_INIT"
-
-FIRST_ORDER = [TRANSPOSE, EXCHANGE, INSERT]
-SECOND_ORDER = [TRANSPOSE, INSERT, EXCHANGE]
+RII = "RII"
+ILS = "ILS"
 
 
 def parse_args():
@@ -42,181 +32,36 @@ def parse_args():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("instance", help="Instance file name")
-    parser.add_argument("--measure", help="Measure mode", action="store_true")
     parser.add_argument(
-        "--vnd", help="Variable Neighbourhood Descend", action="store_true")
-    pivoting_group = parser.add_mutually_exclusive_group()
-    pivoting_group.add_argument(
-        "--first", help="first-improvement pivoting rule", action="store_true")
-    pivoting_group.add_argument(
-        "--best", help="best-improvement pivoting rule", action="store_true")
-    neighbourhood_group = parser.add_mutually_exclusive_group()
-    neighbourhood_group.add_argument(
-        "--transpose", help="transpose neighborhood", action="store_true")
-    neighbourhood_group.add_argument(
-        "--exchange", help="exchange neighborhood", action="store_true")
-    neighbourhood_group.add_argument(
-        "--insert", help="instert neighborhood", action="store_true")
-    initial_solution_group = parser.add_mutually_exclusive_group()
-    initial_solution_group.add_argument(
-        "--random-init", help="randomly generated initial solution", action="store_true")
-    initial_solution_group.add_argument(
-        "--srz", help="simplified RZ heuristic initial solution", action="store_true")
-    neighbourhood_order_group = parser.add_mutually_exclusive_group()
-    neighbourhood_order_group.add_argument(
-        "--tei", help="transpose, exchange, insert neighborhood order", action="store_true")
-    neighbourhood_order_group.add_argument(
-        "--tie", help="transpose, insert, exchange neighborhood order", action="store_true")
+        "--rii", help="Randomized Iterative Improvement", action="store_true")
+    parser.add_argument(
+        "--ils", help="Iterated Local Search", action="store_true")
 
     args = parser.parse_args()
 
-    pivoting = FIRST_IMPROVEMENT
-    neighbourhood = TRANSPOSE
-    initial_solution = RANDOM_INIT
-    if args.best:
-        pivoting = BEST_IMPROVEMENT
-    if args.exchange:
-        neighbourhood = EXCHANGE
-    elif args.insert:
-        neighbourhood = INSERT
-    if args.srz:
-        initial_solution = SRZ
-    if args.tei:
-        neighbourhood_order = FIRST_ORDER
-    elif args.tie:
-        neighbourhood_order = SECOND_ORDER
-    else:
-        neighbourhood_order = FIRST_ORDER
+    if args.rii:
+        method = RII
+    elif args.ils:
+        method = ILS
 
-    return args.vnd, args.instance, pivoting, neighbourhood, initial_solution, args.measure, neighbourhood_order
+    return args.instance, method
 
 
 if __name__ == '__main__':
-    # vnd, filename, pivoting_arg, neighbourhood_arg, initial_solution_arg, measure, neighbourhood_order = parse_args()
-    # if measure:
-    #     if vnd:
-    #         measure_vnd_times()
-    #     else:
-    #         measure_ii_times()
-    # else:
-    #     instance = Instance()
-    #     instance.read_data_from_file(filename)
-    #     if initial_solution_arg == RANDOM_INIT:
-    #         initial_solution = get_random_permutation(instance.get_nb_jobs())
-    #     else:
-    #         initial_solution = get_rz_heuristic(instance)
-    #     print("Initial solution : ", initial_solution)
-    #     start_time = time.time()
+    instance_name, method = parse_args()
+    instance = Instance()
+    instance.read_data_from_file(instance_name)
+    if method == RII:
+        if instance.get_nb_jobs() == 50:
+            sol, wct = instance.solve_rii(0.04, 150)
+        else:
+            sol, wct = instance.solve_rii(0.02, 350)
 
-    #     if vnd:
-    #         solution, wct = instance.solve_vnd(
-    #             initial_solution, neighbourhood_order)
-    #     else:
-    #         solution, wct = instance.solve_ii(
-    #             initial_solution, pivoting_arg, neighbourhood_arg)
-    #     print("Final job permutation : ", solution)
-    #     print("Weighted sum of Completion Times : ", wct)
-    #     print("Execution time : %s seconds" % (time.time() - start_time))
-    # compute_rii_averages()
+    else:
+        if instance.get_nb_jobs() == 50:
+            sol, wct = instance.solve_ils(1, 30, 150)
+        else:
+            sol, wct = instance.solve_rii(6, 10, 350)
 
-    # instance = Instance()
-    # instance.read_data_from_file("./instances/100_20_01")
-    # a = instance.compute_temperature(20)
-    # print(a)
-    # sol, wct = instance.solve_ils(200, 20, 4)
-    # print(wct)
-
-    # initial_solution = get_random_permutation(instance)
-    # sol, wct = instance.solve_rii(0.2, 20)
-
-    # print(wct)
-    # compute_rii_averages()
-    # t = time.time()
-    # os.chdir("instances")
-    # files = os.listdir()
-    # files.sort()
-    # probabilities = [0.1, 0.2, 0.3]
-    # for f in files:
-    #     processes = []
-    #     if "." not in f and f != "measures" and "100" in f:
-    #         for proba in probabilities:
-    #             for i in range(5):
-    #                 p = multiprocessing.Process(
-    #                     target=measure_rii, args=(i, proba, f, 350,))
-    #                 processes.append(p)
-    #                 p.start()
-    #     if "." not in f and f != "measures" and "50" in f:
-    #         for proba in probabilities:
-    #             for i in range(5):
-    #                 p = multiprocessing.Process(
-    #                     target=measure_rii, args=(i, proba, f, 150,))
-    #                 processes.append(p)
-    #                 p.start()
-    #     for process in processes:
-    #         process.join()
-
-    # arrange_rii_files()
-
-    compute_rii_averages()
-
-    # compute_ils_averages()
-
-    # t = time.time()
-    # compute_ils_averages()
-    # os.chdir("instances")
-    # files = os.listdir()
-    # files.sort()
-    # gammas_50 = [40, 50, 60]
-    # for f in files:
-    #     processes = []
-    # if "." not in f and f != "measures" and "100" in f:
-    # for g in gammas_100:
-    #     for i in range(5):
-    #         p = multiprocessing.Process(
-    #             target=measure_ils, args=(i, g, 10, f, 500,))
-    #         processes.append(p)
-    #         p.start()
-    # if "." not in f and f != "measures" and "50" in f:
-    #     for g in gammas_50:
-    #         for i in range(5):
-    #             p = multiprocessing.Process(
-    #                 target=measure_ils, args=(i, 1, g, f, 150,))
-    #             processes.append(p)
-    #             p.start()
-
-    # for process in processes:
-    #     process.join()
-
-    # rtd_files = ["./instances/50_20_01", "./instances/50_20_02"]
-    # for f in rtd_files:
-    #     processes = []
-    #     for j in range(2):
-    #         for i in range(13):
-    #             p = multiprocessing.Process(
-    #                 target=measure_rii_rtd, args=((i*13)+j, f, 0.04, 1000,))
-    #             processes.append(p)
-    #             p.start()
-
-    #         for process in processes:
-    #             process.join()
-
-    # for f in rtd_files:
-    #     processes = []
-    #     for j in range(2):
-    #         for i in range(13):
-    #             p = multiprocessing.Process(
-    #                 target=measure_ils_rtd, args=((i*13)+j, f, 1, 30, 1000,))
-    #             processes.append(p)
-    #             p.start()
-
-    #         for process in processes:
-    #             process.join()
-
-    # instance = Instance()
-    # instance.read_data_from_file("./instances/50_20_01")
-    # initial_solution = get_random_permutation(instance.get_nb_jobs())
-    # print("Initial solution : ", initial_solution)
-    # solution, wct = instance.solve_rii(initial_solution, 0.2, 10)
-    # print(wct)
-
-    # print(time.time() - t)
+    print("Solution :", sol)
+    print("Best WCT : ", wct)
